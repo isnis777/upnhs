@@ -6,6 +6,8 @@ namespace QLTK;
 public class AccountRow
 {
     public int STT { get; set; }
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
     public string UserAo { get; set; } = string.Empty;
     public string CharacterName { get; set; } = string.Empty;
     public int Server { get; set; } = 1;
@@ -14,6 +16,20 @@ public class AccountRow
     public string Gold { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public string PID { get; set; } = string.Empty;
+
+    [JsonIgnore]
+    public bool IsRealAccount => !string.IsNullOrWhiteSpace(Username);
+
+    [JsonIgnore]
+    public string DisplayAccount
+    {
+        get
+        {
+            if (!string.IsNullOrWhiteSpace(Username)) return Username;
+            if (!string.IsNullOrWhiteSpace(UserAo)) return UserAo;
+            return "Chơi mới (ảo)";
+        }
+    }
 
     // Internal management
     public string ClientId { get; set; } = string.Empty;
@@ -44,6 +60,15 @@ public class AccountRow
     public AccountRow(int stt, int server, string clientId)
     {
         STT = stt;
+        Server = server;
+        ClientId = clientId;
+    }
+
+    public AccountRow(int stt, string username, string password, int server, string clientId)
+    {
+        STT = stt;
+        Username = username;
+        Password = password;
         Server = server;
         ClientId = clientId;
     }

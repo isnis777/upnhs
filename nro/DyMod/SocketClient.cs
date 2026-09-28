@@ -205,16 +205,23 @@ public class SocketClient
 		string currentStatus = GetCurrentStatus();
 		string text5 = ProcessId.ToString();
 		string text6 = string.Empty;
-		try
+		if (AutoLogin.IsRealAccount)
 		{
-			text6 = Rms.loadRMSString(Rms.RMS_userAo + ServerListScreen.ipSelect);
+			text6 = AutoLogin.CustomUser;
 		}
-		catch
+		else
 		{
-		}
-		if (string.IsNullOrEmpty(text6))
-		{
-			text6 = AutoLogin.CustomUserAo;
+			try
+			{
+				text6 = Rms.loadRMSString(Rms.RMS_userAo + ServerListScreen.ipSelect);
+			}
+			catch
+			{
+			}
+			if (string.IsNullOrEmpty(text6))
+			{
+				text6 = AutoLogin.CustomUserAo;
+			}
 		}
 		string message = $"DATA|{AutoLogin.IdClientSocket}|{text}|{num}|{text2}|{text3}|{text4}|{currentStatus}|{text5}|{text6}|{textTiemNang}";
 		Send(message);

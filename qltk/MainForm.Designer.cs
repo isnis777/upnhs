@@ -52,6 +52,7 @@ partial class MainForm
         
         flowButtons = new FlowLayoutPanel();
         btnAddRow = new Button();
+        btnAddReal = new Button();
         btnDelete = new Button();
         btnStart = new Button();
         btnStop = new Button();
@@ -64,6 +65,7 @@ partial class MainForm
         dgvAccounts = new DataGridView();
         colSTT = new DataGridViewTextBoxColumn();
         colUserAo = new DataGridViewTextBoxColumn();
+        colPassword = new DataGridViewTextBoxColumn();
         colCharName = new DataGridViewTextBoxColumn();
         colServer = new DataGridViewTextBoxColumn();
         colPlanet = new DataGridViewTextBoxColumn();
@@ -355,9 +357,22 @@ partial class MainForm
         btnAddRow.Margin = new Padding(2);
         btnAddRow.Name = "btnAddRow";
         btnAddRow.Size = new Size(100, 32);
-        btnAddRow.Text = "➕ Thêm dòng";
+        btnAddRow.Text = "➕ Thêm ảo";
         btnAddRow.UseVisualStyleBackColor = false;
         btnAddRow.Click += BtnAddRow_Click;
+
+        // btnAddReal
+        btnAddReal.BackColor = Color.FromArgb(39, 174, 96);
+        btnAddReal.FlatStyle = FlatStyle.Flat;
+        btnAddReal.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
+        btnAddReal.ForeColor = Color.White;
+        btnAddReal.Location = new Point(106, 2);
+        btnAddReal.Margin = new Padding(2);
+        btnAddReal.Name = "btnAddReal";
+        btnAddReal.Size = new Size(135, 32);
+        btnAddReal.Text = "➕ Thêm nick thật";
+        btnAddReal.UseVisualStyleBackColor = false;
+        btnAddReal.Click += BtnAddReal_Click;
 
         // btnDelete
         btnDelete.BackColor = Color.FromArgb(192, 57, 43);
@@ -477,6 +492,7 @@ partial class MainForm
         flowTop.Controls.Add(chkDyTest);
 
         flowButtons.Controls.Add(btnAddRow);
+        flowButtons.Controls.Add(btnAddReal);
         flowButtons.Controls.Add(btnDelete);
         flowButtons.Controls.Add(btnStart);
         flowButtons.Controls.Add(btnStop);
@@ -503,7 +519,7 @@ partial class MainForm
         dgvAccounts.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
         dgvAccounts.ColumnHeadersHeight = 32;
         dgvAccounts.Columns.AddRange(new DataGridViewColumn[] {
-            colSTT, colUserAo, colCharName, colServer, colPlanet, colPower, colGold, colStatus, colPID
+            colSTT, colUserAo, colPassword, colCharName, colServer, colPlanet, colPower, colGold, colStatus, colPID
         });
         dgvAccounts.Dock = DockStyle.Fill;
         dgvAccounts.EnableHeadersVisualStyles = false;
@@ -529,11 +545,18 @@ partial class MainForm
         colSTT.Width = 55;
 
         // colUserAo
-        colUserAo.DataPropertyName = "UserAo";
-        colUserAo.HeaderText = "Tài khoản ảo";
+        colUserAo.DataPropertyName = "DisplayAccount";
+        colUserAo.HeaderText = "Tài khoản";
         colUserAo.Name = "colUserAo";
         colUserAo.ReadOnly = true;
-        colUserAo.Width = 130;
+        colUserAo.Width = 125;
+
+        // colPassword
+        colPassword.DataPropertyName = "Password";
+        colPassword.HeaderText = "Mật khẩu";
+        colPassword.Name = "colPassword";
+        colPassword.ReadOnly = true;
+        colPassword.Width = 90;
 
         // colCharName
         colCharName.DataPropertyName = "CharacterName";
@@ -665,6 +688,7 @@ partial class MainForm
 
     private FlowLayoutPanel flowButtons;
     private Button btnAddRow;
+    private Button btnAddReal;
     private Button btnDelete;
     private Button btnStart;
     private Button btnStop;
@@ -677,6 +701,7 @@ partial class MainForm
     private DataGridView dgvAccounts;
     private DataGridViewTextBoxColumn colSTT;
     private DataGridViewTextBoxColumn colUserAo;
+    private DataGridViewTextBoxColumn colPassword;
     private DataGridViewTextBoxColumn colCharName;
     private DataGridViewTextBoxColumn colServer;
     private DataGridViewTextBoxColumn colPlanet;

@@ -361,6 +361,27 @@ public partial class MainForm : Form
         SaveAccountsToFile();
     }
 
+    // 1.1 Thêm tài khoản thật (Hỗ trợ cả dán danh sách hàng loạt và thêm từng nick lẻ)
+    private void BtnAddReal_Click(object? sender, EventArgs e)
+    {
+        int defaultServer = (int)numServer.Value;
+        using var form = new AddAccountForm(defaultServer);
+        if (form.ShowDialog(this) == DialogResult.OK || form.AddedAccounts.Count > 0)
+        {
+            foreach (var (user, pass, sv) in form.AddedAccounts)
+            {
+                int nextSTT = _accountList.Count + 1;
+                string clientId = "tab_" + nextSTT;
+                var newRow = new AccountRow(nextSTT, user, pass, sv, clientId);
+                _accountList.Add(newRow);
+            }
+
+            UpdateStatusText();
+            SaveAccountsToFile();
+            dgvAccounts.Refresh();
+        }
+    }
+
     // 2. Xóa: Xóa toàn bộ dòng đang chọn (hỗ trợ giữ Shift + kéo chuột chọn nhiều dòng)
     private void BtnDelete_Click(object? sender, EventArgs e)
     {
@@ -569,9 +590,17 @@ public partial class MainForm : Form
             }
 
             string userAoArgs = "";
-            if (!string.IsNullOrWhiteSpace(row.UserAo))
+            if (row.IsRealAccount)
             {
-                userAoArgs = $"-userao {row.UserAo.Trim()}";
+                userAoArgs = $"-user {row.Username.Trim()} -pass \"{row.Password.Trim()}\" -autonhs 0";
+            }
+            else
+            {
+                userAoArgs = "-autonhs 1";
+                if (!string.IsNullOrWhiteSpace(row.UserAo))
+                {
+                    userAoArgs += $" -userao {row.UserAo.Trim()}";
+                }
             }
 
             string optArgs = $"-fps {(int)numFps.Value} -lowram {(chkOptimizeRam.Checked ? 1 : 0)} -blackscreen {(chkBlackScreen.Checked ? 1 : 0)}";
@@ -684,10 +713,10 @@ public partial class MainForm : Form
             CleanCurrentProcessMemory();
         }
 
-        // 1. Kiểm tra tab đang chạy bị treo quá 60s không tăng SM/TN hoặc mất phản hồi
+        // 1. Kiểm tra tab đang chạy bị treo quá 60s không tăng SM/TN hoặc mất phản hồi (chỉ áp dụng cho tài khoản ảo đang làm nhiệm vụ)
         foreach (var row in _accountList)
         {
-            if (row.ActiveProcess != null && !row.ActiveProcess.HasExited && !row.IsStoppedManually && row.Status != "hoàn thành")
+            if (row.ActiveProcess != null && !row.ActiveProcess.HasExited && !row.IsStoppedManually && row.Status != "hoàn thành" && !row.IsRealAccount)
             {
                 if (row.LastProgressTime != DateTime.MinValue && (now - row.LastProgressTime).TotalSeconds >= 60)
                 {

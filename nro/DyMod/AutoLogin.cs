@@ -37,6 +37,14 @@ public class AutoLogin
 
 	public static string CustomUserAo = string.Empty;
 
+	public static string CustomUser = string.Empty;
+
+	public static string CustomPass = string.Empty;
+
+	public static bool IsRealAccount => !string.IsNullOrEmpty(CustomUser);
+
+	public static bool IsAutoNhs = true;
+
 	private static long _lastActionTime;
 
 	private static long _lastLoginAttempt;
@@ -127,6 +135,24 @@ public class AutoLogin
 				{
 					IsBlackScreen = commandLineArgs[++i] == "1";
 				}
+				else if (text.Equals("-user", StringComparison.OrdinalIgnoreCase) && i + 1 < commandLineArgs.Length)
+				{
+					CustomUser = commandLineArgs[++i];
+				}
+				else if (text.Equals("-pass", StringComparison.OrdinalIgnoreCase) && i + 1 < commandLineArgs.Length)
+				{
+					CustomPass = commandLineArgs[++i];
+				}
+				else if (text.Equals("-autonhs", StringComparison.OrdinalIgnoreCase) && i + 1 < commandLineArgs.Length)
+				{
+					IsAutoNhs = commandLineArgs[++i] == "1";
+				}
+			}
+			if (IsRealAccount)
+			{
+				IsAutoNhs = false;
+				AutoTrain.IsEnabled = false;
+				AutoTrain.CurrentStatus = "Đang đăng nhập";
 			}
 			ActionLogger.IsRecordingEnabled = IsDyTest;
 			if (TargetFps > 0)
@@ -191,6 +217,11 @@ public class AutoLogin
 			if (IsLoginSuccess())
 			{
 				_lastLoginAttempt = 0L;
+				if (IsRealAccount && !IsAutoNhs)
+				{
+					AutoTrain.IsEnabled = false;
+					AutoTrain.CurrentStatus = "Đã vào game";
+				}
 			}
 			else if (GameCanvas.currentScreen is RegisterScreen || (GameCanvas.registerScr != null && GameCanvas.currentScreen == GameCanvas.registerScr))
 			{
@@ -267,21 +298,40 @@ public class AutoLogin
 			}
 			else if (GameCanvas.currentScreen is LoginScr)
 			{
-				if (!(GameCanvas.currentDialog is MsgDlg { isWait: not false }) && num - _lastLoginAttempt > 8000)
+				if (!(GameCanvas.currentDialog is MsgDlg { isWait: not false }) && num - _lastLoginAttempt > 5000)
 				{
 					_lastLoginAttempt = num;
-					string value = Rms.loadRMSString(Rms.RMS_userAo + ServerListScreen.ipSelect);
-					if (string.IsNullOrEmpty(value))
+					if (IsRealAccount)
 					{
-						value = CustomUserAo;
-					}
-					if (!string.IsNullOrEmpty(value))
-					{
+						try
+						{
+							Rms.saveRMSString(Rms.RMS_acc, CustomUser);
+							Rms.saveRMSString(Rms.RMS_pass, CustomPass ?? string.Empty);
+							Rms.saveRMSString(Rms.RMS_userAo + ServerListScreen.ipSelect, string.Empty);
+							if (GameCanvas.loginScr != null)
+							{
+								if (GameCanvas.loginScr.tfUser != null) GameCanvas.loginScr.tfUser.setText(CustomUser);
+								if (GameCanvas.loginScr.tfPass != null) GameCanvas.loginScr.tfPass.setText(CustomPass ?? string.Empty);
+							}
+						}
+						catch { }
 						GameCanvas.loginScr.doLogin();
 					}
-					else if (GameCanvas.serverScreen != null)
+					else
 					{
-						GameCanvas.serverScreen.switchToMe();
+						string value = Rms.loadRMSString(Rms.RMS_userAo + ServerListScreen.ipSelect);
+						if (string.IsNullOrEmpty(value))
+						{
+							value = CustomUserAo;
+						}
+						if (!string.IsNullOrEmpty(value))
+						{
+							GameCanvas.loginScr.doLogin();
+						}
+						else if (GameCanvas.serverScreen != null)
+						{
+							GameCanvas.serverScreen.switchToMe();
+						}
 					}
 				}
 			}
@@ -308,20 +358,37 @@ public class AutoLogin
 						return;
 					}
 					_lastLoginAttempt = num;
-					string value2 = Rms.loadRMSString(Rms.RMS_userAo + ServerListScreen.ipSelect);
-					if (string.IsNullOrEmpty(value2) && !string.IsNullOrEmpty(CustomUserAo))
+					if (IsRealAccount)
 					{
 						try
 						{
-							Rms.saveRMSString(Rms.RMS_userAo + ServerListScreen.ipSelect, CustomUserAo);
+							Rms.saveRMSString(Rms.RMS_acc, CustomUser);
+							Rms.saveRMSString(Rms.RMS_pass, CustomPass ?? string.Empty);
+							Rms.saveRMSString(Rms.RMS_userAo + ServerListScreen.ipSelect, string.Empty);
 						}
-						catch
+						catch { }
+						if (GameCanvas.serverScreen != null)
 						{
+							GameCanvas.serverScreen.Login_New();
 						}
 					}
-					if (GameCanvas.serverScreen != null)
+					else
 					{
-						GameCanvas.serverScreen.Login_New();
+						string value2 = Rms.loadRMSString(Rms.RMS_userAo + ServerListScreen.ipSelect);
+						if (string.IsNullOrEmpty(value2) && !string.IsNullOrEmpty(CustomUserAo))
+						{
+							try
+							{
+								Rms.saveRMSString(Rms.RMS_userAo + ServerListScreen.ipSelect, CustomUserAo);
+							}
+							catch
+							{
+							}
+						}
+						if (GameCanvas.serverScreen != null)
+						{
+							GameCanvas.serverScreen.Login_New();
+						}
 					}
 				}
 			}
