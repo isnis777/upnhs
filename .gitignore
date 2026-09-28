@@ -1,0 +1,31 @@
+# Video and large media (bắt buộc chặn để không vượt quá giới hạn 100MB của GitHub)
+*.mp4
+*.avi
+*.mkv
+*.mov
+useraonhs.mp4
+
+# Build outputs & executables
+[Bb]in/
+[Oo]bj/
+[Pp]ublish/
+publish_standalone/
+*.exe
+*.dll
+*.pdb
+
+# Log files
+*.log
+game_action_log*.txt
+
+# IDE / Editor files
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# OS generated files
+Thumbs.db
+Desktop.ini
